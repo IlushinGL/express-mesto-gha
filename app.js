@@ -10,8 +10,19 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://localhost:27017/mestodb');
 
+// временное решение авторизации
+// ------------------------------
+app.use((req, res, next) => {
+  req.user = {
+    _id: '64c2ef6caadb9f2e5bdeaa6f',
+  };
+  next();
+});
+// ------------------------------
+
 app.use('/users', require('./routes/user'));
+app.use('/cards', require('./routes/card'));
 
 app.listen(PORT, () => {
-  console.log(`Сервер запущен на ${PORT} порту`);
+  console.log(`Сервер запущен, порт: ${PORT}`);
 });
