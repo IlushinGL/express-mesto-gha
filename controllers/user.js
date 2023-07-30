@@ -3,25 +3,56 @@ const User = require('../models/user');
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка getAllUsers' }));
+    .catch((err) => {
+      res.status(500).send({ message: `getAllUsers: ${err.message}` });
+    });
 };
 
 module.exports.getUser = (req, res) => {
   User.findById(req.params.userId)
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка getUser' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'getUser: Пользователь по указанному _id не найден.' });
+        return;
+      }
+      res.status(500).send({ message: `getUser: ${err.message}` });
+    });
 };
 
 module.exports.newUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
+  User.create(
+    req.body,
+  )
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка newUser' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'newUser: Переданы некорректные данные при создании пользователя.' });
+        return;
+      }
+      res.status(500).send({ message: `newUser: ${err.message}` });
+    });
 };
 
 module.exports.setUserProfile = (req, res) => {
-  User.findByIdAndUpdate(req.user._id, req.body, { new: true })
+  User.findByIdAndUpdate(
+    req.user._id,
+    req.body,
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
     .then((user) => res.send({ data: user }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка setUserProfile' }));
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'setUserProfile: Пользователь с указанным _id не найден.' });
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'setUserProfile: Переданы некорректные данные при обновлении профиля.' });
+        return;
+      }
+      res.status(500).send({ message: `setUserProfile: ${err.message}` });
+    });
 };
