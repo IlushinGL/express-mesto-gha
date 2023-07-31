@@ -44,7 +44,6 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((card) => {
@@ -59,10 +58,10 @@ module.exports.likeCard = (req, res) => {
         res.status(400).send({ message: 'likeCard: Передан некорректный _id карточки.' });
         return;
       }
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'likeCard: Переданы некорректные данные для постановки лайка. .' });
-        return;
-      }
+      // if (err.name === 'ValidationError') {
+      //   res.status(400).send({ message: 'likeCard: Переданы некорректные данные для постановки лайка. .' });
+      //   return;
+      // }
       res.status(500).send({ message: `likeCard: ${err.message}` });
     });
 };
@@ -73,7 +72,6 @@ module.exports.dislikeCard = (req, res) => {
     { $pull: { likes: req.user._id } },
     {
       new: true,
-      runValidators: true,
     },
   )
     .then((card) => {
@@ -88,10 +86,10 @@ module.exports.dislikeCard = (req, res) => {
         res.status(400).send({ message: 'dislikeCard: Передан некорректный _id карточки.' });
         return;
       }
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'dislikeCard: Переданы некорректные данные для снятия лайка. .' });
-        return;
-      }
+      // if (err.name === 'ValidationError') {
+      //   res.status(400).send({ message: 'dislikeCard: Переданы некорректные данные для снятия лайка. .' });
+      //   return;
+      // }
       res.status(500).send({ message: `dislikeCard: ${err.message}` });
     });
 };
