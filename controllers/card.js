@@ -56,7 +56,7 @@ module.exports.likeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'likeCard: Передан несуществующий _id карточки.' });
+        res.status(400).send({ message: 'likeCard: Передан некорректный _id карточки.' });
         return;
       }
       if (err.name === 'ValidationError') {
@@ -85,7 +85,7 @@ module.exports.dislikeCard = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(404).send({ message: 'dislikeCard: Передан несуществующий _id карточки.' });
+        res.status(400).send({ message: 'dislikeCard: Передан некорректный _id карточки.' });
         return;
       }
       if (err.name === 'ValidationError') {
