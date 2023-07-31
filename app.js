@@ -23,6 +23,10 @@ app.use((req, res, next) => {
 app.use('/users', require('./routes/user'));
 app.use('/cards', require('./routes/card'));
 
+app.use('/*', (req, res) => {
+  res.status(500).send({ message: 'App: Неизвестный маршрут.' });
+});
+
 app.listen(PORT, () => {
   console.log(`Сервер запущен, порт: ${PORT}`);
 });
