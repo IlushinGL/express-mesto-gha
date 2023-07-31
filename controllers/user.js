@@ -51,10 +51,6 @@ module.exports.setUserProfile = (req, res) => {
   )
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(404).send({ message: 'setUserProfile: Пользователь с указанным _id не найден.' });
-        return;
-      }
       if (err.name === 'ValidationError') {
         res.status(400).send({ message: 'setUserProfile: Переданы некорректные данные при обновлении профиля.' });
         return;
