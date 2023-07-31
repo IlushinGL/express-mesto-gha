@@ -3,13 +3,25 @@ const Card = require('../models/card');
 module.exports.getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка getAllCards' }));
+    .catch((err) => res.status(500).send({ message: `getAllCards: ${err.message}` }));
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка deleteCard' }));
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+        return;
+      }
+      res.status(404).send({ message: 'deleteCard: Карточка с указанным _id не найдена.' });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'deleteCard: Карточка с указанным _id не найдена.' });
+        return;
+      }
+      res.status(500).send({ message: `deleteCard: ${err.message}` });
+    });
 };
 
 module.exports.newCard = (req, res) => {
@@ -17,25 +29,69 @@ module.exports.newCard = (req, res) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка newCard' }));
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'newCard: Переданы некорректные данные при создании карточки.' });
+        return;
+      }
+      res.status(500).send({ message: `newCard: ${err.message}` });
+    });
 };
 
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
-    { new: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка likeCard' }));
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+        return;
+      }
+      res.status(404).send({ message: 'likeCard: Передан несуществующий _id карточки.' });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'likeCard: Передан несуществующий _id карточки.' });
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'likeCard: Переданы некорректные данные для постановки лайка. .' });
+        return;
+      }
+      res.status(500).send({ message: `likeCard: ${err.message}` });
+    });
 };
 
 module.exports.dislikeCard = (req, res) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
-    { new: true },
+    {
+      new: true,
+      runValidators: true,
+    },
   )
-    .then((card) => res.send({ data: card }))
-    .catch(() => res.status(500).send({ message: 'Произошла ошибка dislikeCard' }));
+    .then((card) => {
+      if (card) {
+        res.send({ data: card });
+        return;
+      }
+      res.status(404).send({ message: 'dislikeCard: Передан несуществующий _id карточки.' });
+    })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(404).send({ message: 'dislikeCard: Передан несуществующий _id карточки.' });
+        return;
+      }
+      if (err.name === 'ValidationError') {
+        res.status(400).send({ message: 'dislikeCard: Переданы некорректные данные для снятия лайка. .' });
+        return;
+      }
+      res.status(500).send({ message: `dislikeCard: ${err.message}` });
+    });
 };
