@@ -53,10 +53,10 @@ module.exports.newUser = (req, res) => {
     });
 };
 
-module.exports.setUserProfile = (req, res) => {
+function setUser(id, data, res) {
   User.findByIdAndUpdate(
-    req.user._id,
-    req.body,
+    id,
+    data,
     {
       new: true,
       runValidators: true,
@@ -70,4 +70,12 @@ module.exports.setUserProfile = (req, res) => {
       }
       res.status(INTERNAL_SERVER_ERROR).send({ message: `setUserProfile: ${err.message}` });
     });
+}
+
+module.exports.setUserProfile = (req, res) => {
+  setUser(req.user._id, { name: req.body.name, about: req.body.about }, res);
+};
+
+module.exports.setUserAvatar = (req, res) => {
+  setUser(req.user._id, { avatar: req.body.avatar }, res);
 };
