@@ -1,26 +1,39 @@
+const {
+  DocumentNotFoundError,
+  CastError,
+  ValidationError,
+} = require('mongoose').Error;
+const {
+  NOT_FOUND,
+  BAD_REQUEST,
+  INTERNAL_SERVER_ERROR,
+  CREATED,
+} = require('http-status-codes').StatusCodes;
+
 const Card = require('../models/card');
 
 module.exports.getAllCards = (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch((err) => res.status(500).send({ message: `getAllCards: ${err.message}` }));
+    .catch((err) => res.status(INTERNAL_SERVER_ERROR).send({ message: `getAllCards: ${err.message}` }));
 };
 
 module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail()
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-        return;
-      }
-      res.status(404).send({ message: 'deleteCard: Карточка с указанным _id не найдена.' });
+      res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'deleteCard: Передан некорректный _id карточки.' });
+      if (err instanceof DocumentNotFoundError) {
+        res.status(NOT_FOUND).send({ message: 'deleteCard: Карточка с указанным _id не найдена.' });
         return;
       }
-      res.status(500).send({ message: `deleteCard: ${err.message}` });
+      if (err instanceof CastError) {
+        res.status(BAD_REQUEST).send({ message: 'deleteCard: Передан некорректный _id карточки.' });
+        return;
+      }
+      res.status(INTERNAL_SERVER_ERROR).send({ message: `deleteCard: ${err.message}` });
     });
 };
 
@@ -28,13 +41,13 @@ module.exports.newCard = (req, res) => {
   const { name, link } = req.body;
 
   Card.create({ name, link, owner: req.user._id })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.status(CREATED).send({ data: card }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
-        res.status(400).send({ message: 'newCard: Переданы некорректные данные при создании карточки.' });
+      if (err instanceof ValidationError) {
+        res.status(BAD_REQUEST).send({ message: 'newCard: Переданы некорректные данные при создании карточки.' });
         return;
       }
-      res.status(500).send({ message: `newCard: ${err.message}` });
+      res.status(INTERNAL_SERVER_ERROR).send({ message: `newCard: ${err.message}` });
     });
 };
 
@@ -46,19 +59,20 @@ module.exports.likeCard = (req, res) => {
       new: true,
     },
   )
+    .orFail()
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-        return;
-      }
-      res.status(404).send({ message: 'likeCard: Передан несуществующий _id карточки.' });
+      res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'likeCard: Передан некорректный _id карточки.' });
+      if (err instanceof DocumentNotFoundError) {
+        res.status(NOT_FOUND).send({ message: 'likeCard: Карточка с указанным _id не найдена.' });
         return;
       }
-      res.status(500).send({ message: `likeCard: ${err.message}` });
+      if (err instanceof CastError) {
+        res.status(BAD_REQUEST).send({ message: 'likeCard: Передан некорректный _id карточки.' });
+        return;
+      }
+      res.status(INTERNAL_SERVER_ERROR).send({ message: `likeCard: ${err.message}` });
     });
 };
 
@@ -70,18 +84,19 @@ module.exports.dislikeCard = (req, res) => {
       new: true,
     },
   )
+    .orFail()
     .then((card) => {
-      if (card) {
-        res.send({ data: card });
-        return;
-      }
-      res.status(404).send({ message: 'dislikeCard: Передан несуществующий _id карточки.' });
+      res.send({ data: card });
     })
     .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400).send({ message: 'dislikeCard: Передан некорректный _id карточки.' });
+      if (err instanceof DocumentNotFoundError) {
+        res.status(NOT_FOUND).send({ message: 'dislikeCard: Карточка с указанным _id не найдена.' });
         return;
       }
-      res.status(500).send({ message: `dislikeCard: ${err.message}` });
+      if (err instanceof CastError) {
+        res.status(BAD_REQUEST).send({ message: 'dislikeCard: Передан некорректный _id карточки.' });
+        return;
+      }
+      res.status(INTERNAL_SERVER_ERROR).send({ message: `dislikeCard: ${err.message}` });
     });
 };

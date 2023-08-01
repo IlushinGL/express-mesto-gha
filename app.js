@@ -1,6 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 
+const routesIndex = require('./routes/index');
+
 const { PORT = 3000 } = process.env;
 const app = express();
 
@@ -19,8 +21,7 @@ app.use((req, res, next) => {
 });
 // ------------------------------
 
-app.use('/users', require('./routes/user'));
-app.use('/cards', require('./routes/card'));
+app.use('/', routesIndex);
 
 app.use('/*', (req, res) => {
   res.status(404).send({ message: 'App: Неизвестный запрос.' });
