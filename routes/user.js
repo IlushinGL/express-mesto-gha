@@ -5,11 +5,13 @@ const {
   newUser,
   setUserProfile,
   setUserAvatar,
+  login,
 } = require('../controllers/user');
 
 router.get('/', getAllUsers);
 router.get('/:userId', getUser);
-router.post('/', newUser);
+router.post('/signup', newUser);
+router.post('/signin', login);
 router.patch('/me', setUserProfile);
 router.patch('/me/avatar', setUserAvatar);
 

@@ -1,5 +1,8 @@
-// const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+
+const soulLenght = 8;
+const secretKey = '1dc6351e9232440c4ae47fdad7959cc5fb480615a8bae50aa518599788caa33d';
 const {
   DocumentNotFoundError,
   CastError,
@@ -42,10 +45,7 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.newUser = (req, res) => {
-  // if (validator.isEmail(req.body.email)) {
-
-  // }
-  bcrypt.hash(req.body.password, 8)
+  bcrypt.hash(req.body.password, soulLenght)
     .then((hash) => User.create({
       email: req.body.email,
       password: hash,
@@ -87,6 +87,24 @@ module.exports.setUserAvatar = (req, res) => {
   setUser(req.user._id, { avatar: req.body.avatar }, res);
 };
 
-// module.exports.login = (req, res) => {
-//   setUser(req.user._id, { avatar: req.body.avatar }, res);
-// };
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      // аутентификация успешна, пользователь в переменной user
+      const token = jwt.sign(
+        { _id: user._id },
+        secretKey,
+        // токен будет просрочен через неделю после создания
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+    })
+    .catch((err) => {
+      // ошибка аутентификации
+      res
+        .status(401)
+        .send({ message: err.message });
+    });
+};
