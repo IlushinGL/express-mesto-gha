@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const {
   UNAUTHORIZED,
 } = require('http-status-codes').StatusCodes;
-const { secretKey } = require('../utils/constants').SECRETS;
+const { secretKey } = require('../utils/constants');
 
 // eslint-disable-next-line consistent-return
 module.exports = (req, res, next) => {
