@@ -1,8 +1,5 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-
-const soulLenght = 8;
-const secretKey = '1dc6351e9232440c4ae47fdad7959cc5fb480615a8bae50aa518599788caa33d';
 const {
   DocumentNotFoundError,
   CastError,
@@ -12,9 +9,11 @@ const {
   NOT_FOUND,
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
+  UNAUTHORIZED,
   CREATED,
 } = require('http-status-codes').StatusCodes;
 
+const { soulLenght, secretKey } = require('../utils/constants').SECRETS;
 const User = require('../models/user');
 
 module.exports.getAllUsers = (req, res) => {
@@ -104,7 +103,7 @@ module.exports.login = (req, res) => {
     .catch((err) => {
       // ошибка аутентификации
       res
-        .status(401)
+        .status(UNAUTHORIZED)
         .send({ message: err.message });
     });
 };
