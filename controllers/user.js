@@ -1,3 +1,5 @@
+// const validator = require('validator');
+const bcrypt = require('bcryptjs');
 const {
   DocumentNotFoundError,
   CastError,
@@ -40,9 +42,14 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.newUser = (req, res) => {
-  User.create(
-    req.body,
-  )
+  // if (validator.isEmail(req.body.email)) {
+
+  // }
+  bcrypt.hash(req.body.password, 8)
+    .then((hash) => User.create({
+      email: req.body.email,
+      password: hash,
+    }))
     .then((user) => res.status(CREATED).send({ data: user }))
     .catch((err) => {
       if (err instanceof ValidationError) {
@@ -79,3 +86,7 @@ module.exports.setUserProfile = (req, res) => {
 module.exports.setUserAvatar = (req, res) => {
   setUser(req.user._id, { avatar: req.body.avatar }, res);
 };
+
+// module.exports.login = (req, res) => {
+//   setUser(req.user._id, { avatar: req.body.avatar }, res);
+// };
