@@ -13,7 +13,7 @@ const {
   CREATED,
 } = require('http-status-codes').StatusCodes;
 
-const { soulLenght, secretKey } = require('../utils/constants').SECRETS;
+const { soulLenght, secretKey } = require('../utils/constants');
 const User = require('../models/user');
 
 module.exports.getAllUsers = (req, res) => {
