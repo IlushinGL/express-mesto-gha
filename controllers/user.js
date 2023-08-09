@@ -90,10 +90,13 @@ module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
-    .then((user) => {
-      // аутентификация успешна, пользователь в переменной user
+    // .then((user) => {
+    // аутентификация успешна, пользователь в переменной user
+    .then(() => {
       const token = jwt.sign(
-        { _id: user._id },
+        // { _id: user._id },
+        // токен создаётся для хардкордного _id
+        { _id: 'd285e3dceed844f902650f40' },
         secretKey,
         // токен будет просрочен через неделю после создания
         { expiresIn: '7d' },
