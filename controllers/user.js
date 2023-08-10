@@ -89,7 +89,7 @@ module.exports.setUserAvatar = (req, res) => {
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password).select('+password')
     // .then((user) => {
     // аутентификация успешна, пользователь в переменной user
     .then(() => {
