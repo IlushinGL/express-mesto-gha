@@ -49,7 +49,7 @@ module.exports.newUser = (req, res) => {
       email: req.body.email,
       password: hash,
     }))
-    .then((user) => res.status(CREATED).send({ data: user }))
+    .then((user) => res.status(CREATED).send(user))
     .catch((err) => {
       if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send({ message: 'newUser: Переданы некорректные данные при создании пользователя.' });
