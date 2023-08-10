@@ -1,11 +1,18 @@
 const router = require('express').Router();
+const { celebrate, Joi } = require('celebrate');
 const {
   newUser,
   login,
 } = require('../controllers/user');
 const auth = require('../middlewares/auth');
 
-router.post('/signup', newUser);
+router.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+  }).unknown(true),
+}), newUser);
+
 router.post('/signin', login);
 
 router.use(auth);
