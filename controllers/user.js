@@ -49,7 +49,7 @@ module.exports.newUser = (req, res) => {
       ...req.body,
       password: hash,
     }))
-    .then((user) => res.status(CREATED).send(user))
+    .then((user) => res.status(CREATED).send({ ...user, password: undefined }))
     .catch((err) => {
       if (err instanceof ValidationError) {
         res.status(BAD_REQUEST).send({ message: 'newUser: Переданы некорректные данные при создании пользователя.' });
