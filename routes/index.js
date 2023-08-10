@@ -9,7 +9,6 @@ const {
 } = require('../controllers/user');
 const auth = require('../middlewares/auth');
 
-router.use(errors());
 router.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
@@ -23,6 +22,7 @@ router.use(auth);
 router.use('/users', require('./user'));
 router.use('/cards', require('./card'));
 
+router.use(errors());
 router.use((err, req, res) => {
   // если у ошибки нет статуса, выставляем INTERNAL_SERVER_ERROR
   const { statusCode = INTERNAL_SERVER_ERROR, message } = err;
