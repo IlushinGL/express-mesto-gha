@@ -1,5 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
+const {
+  NOT_FOUND,
+} = require('http-status-codes').StatusCodes;
 
 const routesIndex = require('./routes/index');
 
@@ -20,7 +23,7 @@ app.use((req, res, next) => {
 
 app.use('/', routesIndex);
 app.use('/*', (req, res) => {
-  res.status(404).send({ message: 'App: Неизвестный запрос.' });
+  res.status(NOT_FOUND).send({ message: 'app: неизвестный URL' });
 });
 
 app.listen(
