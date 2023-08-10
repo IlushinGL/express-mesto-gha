@@ -11,6 +11,7 @@ const auth = require('../middlewares/auth');
 
 router.post('/signup', celebrate({
   body: Joi.object().keys({
+    email: Joi.string().email(),
     name: Joi.string().required().min(2).max(30),
     about: Joi.string().required().min(2).max(30),
   }).unknown(true),
@@ -30,7 +31,7 @@ router.use((err, req, res) => {
   res
     .status(statusCode)
     .send({
-      // проверяем статус и выставляем сообщение в зависимости от него
+      // проверяем статус и выставляем сообщение
       message: statusCode === INTERNAL_SERVER_ERROR
         ? 'Сервер не смог обработать ошибку'
         : message,
