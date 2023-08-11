@@ -19,24 +19,24 @@ const User = require('../models/user');
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
-    .then((users) => res.send({ data: users }))
+    .then((users) => res.send(users))
     .catch((err) => {
       res.status(INTERNAL_SERVER_ERROR).send({ message: `getAllUsers: ${err.message}` });
     });
 };
 
 module.exports.getUser = (req, res) => {
-  // let userId;
-  // // если _id нет в параметрах, возьмем из текщего
-  // if (!req.params.userId) {
-  //   userId = req.user._id;
-  // } else {
-  //   userId = req.params.userId;
-  // }
-  User.findById(req.params.userId)
+  let userId;
+  // если _id нет в параметрах, возьмем из текщего
+  if (!req.params.userId) {
+    userId = req.user._id;
+  } else {
+    userId = req.params.userId;
+  }
+  User.findById(userId)
     .orFail()
     .then((user) => {
-      res.send({ data: user });
+      res.send(user);
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
