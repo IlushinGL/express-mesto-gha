@@ -14,14 +14,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect(MONGODB_URL);
-
-// app.use((req, res, next) => {
-//   req.user = {
-//     _id: 'd285e3dceed844f902650f40',
-//   };
-//   next();
-// });
-
 app.use('/', routesIndex);
 app.use('/*', (req, res) => {
   res.status(NOT_FOUND).send({ message: 'app: неизвестный URL' });
