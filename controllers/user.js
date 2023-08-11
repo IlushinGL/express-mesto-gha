@@ -13,7 +13,7 @@ const {
   CREATED,
 } = require('http-status-codes').StatusCodes;
 
-const { soulLenght, secretKey } = require('../utils/constants');
+const { SALT_ROUNDS = 8, JWT_SECRET = 'secret_key' } = process.env;
 const User = require('../models/user');
 
 module.exports.getAllUsers = (req, res) => {
@@ -44,7 +44,7 @@ module.exports.getUser = (req, res) => {
 };
 
 module.exports.newUser = (req, res) => {
-  bcrypt.hash(req.body.password, soulLenght)
+  bcrypt.hash(req.body.password, SALT_ROUNDS)
     .then((hash) => User.create({
       ...req.body,
       password: hash,
@@ -90,14 +90,11 @@ module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
-    // .then((user) => {
+    .then((user) => {
     // аутентификация успешна, пользователь в переменной user
-    .then(() => {
       const token = jwt.sign(
-        // { _id: user._id },
-        // токен создаётся для хардкордного _id
-        { _id: 'd285e3dceed844f902650f40' },
-        secretKey,
+        { _id: user._id },
+        JWT_SECRET,
         // токен будет просрочен через неделю после создания
         { expiresIn: '7d' },
       );

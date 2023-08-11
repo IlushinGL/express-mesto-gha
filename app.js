@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const {
@@ -6,20 +7,20 @@ const {
 
 const routesIndex = require('./routes/index');
 
-const { PORT = 3000 } = process.env;
+const { PORT = 3000, MONGODB_URL = 'mongodb://localhost:27017/mestodb' } = process.env;
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
+mongoose.connect(MONGODB_URL);
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: 'd285e3dceed844f902650f40',
-  };
-  next();
-});
+// app.use((req, res, next) => {
+//   req.user = {
+//     _id: 'd285e3dceed844f902650f40',
+//   };
+//   next();
+// });
 
 app.use('/', routesIndex);
 app.use('/*', (req, res) => {
