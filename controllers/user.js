@@ -26,7 +26,14 @@ module.exports.getAllUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  let userId;
+  // если _id нет в параметрах, возьмем из текщего
+  if (!req.params.userId) {
+    userId = req.user._id;
+  } else {
+    userId = req.params.userId;
+  }
+  User.findById(userId)
     .orFail()
     .then((user) => {
       res.send({ data: user });
