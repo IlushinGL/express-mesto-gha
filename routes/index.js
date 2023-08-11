@@ -19,7 +19,12 @@ router.post('/signup', celebrate({
   }).unknown(true),
 }), newUser);
 
-router.post('/signin', login);
+router.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required().min(8),
+  }).unknown(true),
+}), login);
 
 router.use(auth);
 router.use('/users', require('./user'));
