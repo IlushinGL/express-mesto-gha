@@ -8,6 +8,7 @@ const {
 const {
   NOT_FOUND,
   BAD_REQUEST,
+  CONFLICT,
   INTERNAL_SERVER_ERROR,
   UNAUTHORIZED,
   CREATED,
@@ -52,6 +53,10 @@ module.exports.newUser = (req, res) => {
     .then((user) => res.status(CREATED).send({ ...user, password: undefined }))
     .catch((err) => {
       if (err instanceof ValidationError) {
+        if (err.code === 11000) {
+          res.status(CONFLICT).send({ message: 'newUser: Переданы некорректные данные при создании пользователя.' });
+          return;
+        }
         res.status(BAD_REQUEST).send({ message: 'newUser: Переданы некорректные данные при создании пользователя.' });
         return;
       }
