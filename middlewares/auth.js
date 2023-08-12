@@ -9,7 +9,7 @@ const { JWT_SECRET = 'secret_key' } = process.env;
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization || !authorization.startsWith('Bearer ')) {
+  if (!authorization) {
     return res
       .status(UNAUTHORIZED)
       .send({ message: 'Необходима авторизация' });

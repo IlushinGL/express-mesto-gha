@@ -33,6 +33,7 @@ module.exports.getUser = (req, res) => {
   } else {
     userId = req.params.userId;
   }
+  // console.log(userId);
   User.findById(userId)
     .orFail()
     .then((user) => {
@@ -57,7 +58,7 @@ module.exports.newUser = (req, res) => {
       ...req.body,
       password: hash,
     }))
-    .then((user) => res.status(CREATED).send({ ...user, password: undefined }))
+    .then((user) => res.status(CREATED).send({ ...user._doc, password: undefined }))
     .catch((err) => {
       if (err.code === 11000) {
         res.status(CONFLICT).send({ message: 'newUser: Такой пользователь уже существует.' });
