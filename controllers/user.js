@@ -25,33 +25,6 @@ module.exports.getAllUsers = (req, res) => {
     });
 };
 
-module.exports.getUser = (req, res) => {
-  let userId;
-  // если _id нет в параметрах, возьмем из текщего
-  if (!req.params.userId) {
-    userId = req.user._id;
-  } else {
-    userId = req.params.userId;
-  }
-  // console.log(userId);
-  User.findById(userId)
-    .orFail()
-    .then((user) => {
-      res.send(user);
-    })
-    .catch((err) => {
-      if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND).send({ message: 'getUser: Пользователь по указанному _id не найден.' });
-        return;
-      }
-      if (err instanceof CastError) {
-        res.status(BAD_REQUEST).send({ message: 'getUser: Задан некорректный _id пользователя.' });
-        return;
-      }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: `getUser: ${err.message}` });
-    });
-};
-
 module.exports.newUser = (req, res) => {
   bcrypt.hash(req.body.password, SALT_ROUNDS)
     .then((hash) => User.create({
@@ -91,12 +64,39 @@ function setUser(id, data, res) {
     });
 }
 
+function getUser(id, res) {
+  User.findById(id)
+    .orFail()
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      if (err instanceof DocumentNotFoundError) {
+        res.status(NOT_FOUND).send({ message: 'getUser: Пользователь по указанному _id не найден.' });
+        return;
+      }
+      if (err instanceof CastError) {
+        res.status(BAD_REQUEST).send({ message: 'getUser: Задан некорректный _id пользователя.' });
+        return;
+      }
+      res.status(INTERNAL_SERVER_ERROR).send({ message: `getUser: ${err.message}` });
+    });
+}
+
 module.exports.setUserProfile = (req, res) => {
   setUser(req.user._id, { name: req.body.name, about: req.body.about }, res);
 };
 
 module.exports.setUserAvatar = (req, res) => {
   setUser(req.user._id, { avatar: req.body.avatar }, res);
+};
+
+module.exports.getUserMe = (req, res) => {
+  getUser(req.user._id, res);
+};
+
+module.exports.getUserById = (req, res) => {
+  getUser(req.params.userId, res);
 };
 
 module.exports.login = (req, res) => {

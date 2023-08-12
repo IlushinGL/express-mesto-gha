@@ -3,21 +3,23 @@ const { celebrate, Joi } = require('celebrate');
 
 const {
   getAllUsers,
-  getUser,
+  getUserById,
   setUserProfile,
   setUserAvatar,
+  getUserMe,
 } = require('../controllers/user');
 
 const validUrl = require('../utils/validators');
 
 router.get('/', getAllUsers);
+router.get('/me', getUserMe);
 router.get('/:userId', celebrate({
   // валидируем параметр
   params: Joi.object().keys({
     userId: Joi.string().alphanum().required(),
   }),
-}), getUser);
-// router.get('/me', getUser);
+}), getUserById);
+
 router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
