@@ -24,7 +24,17 @@ router.delete('/:cardId', celebrate({
     cardId: Joi.string().hex().required(),
   }),
 }), deleteCard);
-router.put('/:cardId/likes', likeCard);
-router.delete('/:cardId/likes', dislikeCard);
+router.put('/:cardId/likes', celebrate({
+  // валидируем параметр
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().required(),
+  }),
+}), likeCard);
+router.delete('/:cardId/likes', celebrate({
+  // валидируем параметр
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().required(),
+  }),
+}), dislikeCard);
 
 module.exports = router;
