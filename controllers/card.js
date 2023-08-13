@@ -8,6 +8,7 @@ const {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   CREATED,
+  FORBIDDEN,
 } = require('http-status-codes').StatusCodes;
 
 const Card = require('../models/card');
@@ -22,6 +23,10 @@ module.exports.deleteCard = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail()
     .then((card) => {
+      if (card.owner !== req.user._id) {
+        res.status(FORBIDDEN).send({ message: 'deleteCard: Удаление чужой карточки запрещено.' });
+        return;
+      }
       res.send({ data: card });
     })
     .catch((err) => {
