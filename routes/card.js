@@ -14,11 +14,16 @@ const validUrl = require('../utils/validators');
 router.get('/', getAllCards);
 router.post('/', celebrate({
   body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    link: Joi.string().pattern(validUrl()),
+    name: Joi.string().min(2).max(30).required(),
+    link: Joi.string().pattern(validUrl().required()),
   }).unknown(true),
 }), newCard);
-router.delete('/:cardId', deleteCard);
+router.delete('/:cardId', celebrate({
+  // валидируем параметр
+  params: Joi.object().keys({
+    cardId: Joi.string().hex().required(),
+  }),
+}), deleteCard);
 router.put('/:cardId/likes', likeCard);
 router.delete('/:cardId/likes', dislikeCard);
 
