@@ -20,14 +20,20 @@ module.exports.getAllCards = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findById(req.params.cardId)
     .orFail()
     .then((card) => {
       if (card.owner !== req.user._id) {
         res.status(FORBIDDEN).send({ message: 'deleteCard: Удаление чужой карточки запрещено.' });
         return;
       }
-      res.send({ data: card });
+      Card.findByIdAndRemove(req.params.cardId)
+        .then((data) => {
+          res.send({ data });
+        })
+        .catch((err) => {
+          res.status(INTERNAL_SERVER_ERROR).send({ message: `deleteCard: ${err.message}` });
+        });
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
