@@ -23,7 +23,7 @@ module.exports.deleteCard = (req, res) => {
   Card.findById(req.params.cardId)
     .orFail()
     .then((card) => {
-      if (card.owner !== req.user._id) {
+      if (card._doc.owner !== req.user._id) {
         res.status(FORBIDDEN).send({ message: 'deleteCard: Удаление чужой карточки запрещено.' });
         return;
       }
