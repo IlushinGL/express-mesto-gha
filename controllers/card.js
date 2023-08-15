@@ -7,10 +7,10 @@ const {
   CREATED,
 } = require('http-status-codes').StatusCodes;
 
-const InternalServerError = require('../utils/errors/InternalServer');
-const ForbiddenError = require('../utils/errors/Forbidden');
-const BadRequestError = require('../utils/errors/BadRequest');
-const NotFoundError = require('../utils/errors/NotFound');
+const InternalServerError = require('../utils/errors/internal-server-err');
+const ForbiddenError = require('../utils/errors/forbidden-err');
+const BadRequestError = require('../utils/errors/bad-request-err');
+const NotFoundError = require('../utils/errors/not-found-err');
 
 const Card = require('../models/card');
 

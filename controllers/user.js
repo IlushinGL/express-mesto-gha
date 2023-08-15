@@ -9,11 +9,11 @@ const {
   CREATED,
 } = require('http-status-codes').StatusCodes;
 
-const InternalServerError = require('../utils/errors/InternalServer');
-const ConflictError = require('../utils/errors/Conflict');
-const BadRequestError = require('../utils/errors/BadRequest');
-const NotFoundError = require('../utils/errors/NotFound');
-const UnauthorizedError = require('../utils/errors/Unauthorized');
+const InternalServerError = require('../utils/errors/internal-server-err');
+const ConflictError = require('../utils/errors/conflict-err');
+const BadRequestError = require('../utils/errors/bad-request-err');
+const NotFoundError = require('../utils/errors/not-found-err');
+const UnauthorizedError = require('../utils/errors/unauthorized-err');
 
 const { SALT_ROUNDS = 8, JWT_SECRET = 'secret_key' } = process.env;
 const User = require('../models/user');

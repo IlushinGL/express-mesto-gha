@@ -3,7 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/error-handler');
-const NotFoundError = require('./utils/errors/NotFound');
+const NotFoundError = require('./utils/errors/not-found-err');
 
 const routesIndex = require('./routes/index');
 
