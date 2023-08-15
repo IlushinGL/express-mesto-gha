@@ -6,26 +6,27 @@ const {
   ValidationError,
 } = require('mongoose').Error;
 const {
-  NOT_FOUND,
-  BAD_REQUEST,
-  CONFLICT,
-  INTERNAL_SERVER_ERROR,
-  UNAUTHORIZED,
   CREATED,
 } = require('http-status-codes').StatusCodes;
+
+const InternalServerError = require('../utils/errors/InternalServer');
+const ConflictError = require('../utils/errors/Conflict');
+const BadRequestError = require('../utils/errors/BadRequest');
+const NotFoundError = require('../utils/errors/NotFound');
+const UnauthorizedError = require('../utils/errors/Unauthorized');
 
 const { SALT_ROUNDS = 8, JWT_SECRET = 'secret_key' } = process.env;
 const User = require('../models/user');
 
-module.exports.getAllUsers = (req, res) => {
+module.exports.getAllUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send(users))
     .catch((err) => {
-      res.status(INTERNAL_SERVER_ERROR).send({ message: `getAllUsers: ${err.message}` });
+      next(new InternalServerError(`getAllUsers: ${err.message}`));
     });
 };
 
-module.exports.newUser = (req, res) => {
+module.exports.newUser = (req, res, next) => {
   bcrypt.hash(req.body.password, SALT_ROUNDS)
     .then((hash) => User.create({
       ...req.body,
@@ -34,18 +35,18 @@ module.exports.newUser = (req, res) => {
     .then((user) => res.status(CREATED).send({ ...user._doc, password: undefined }))
     .catch((err) => {
       if (err.code === 11000) {
-        res.status(CONFLICT).send({ message: 'newUser: Такой пользователь уже существует.' });
+        next(new ConflictError('newUser: Такой пользователь уже существует.'));
         return;
       }
       if (err instanceof ValidationError) {
-        res.status(BAD_REQUEST).send({ message: 'newUser: Переданы некорректные данные при создании пользователя.' });
+        next(new BadRequestError('newUser: Переданы некорректные данные при создании пользователя.'));
         return;
       }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: `newUser: ${err.message}` });
+      next(new InternalServerError(`newUser: ${err.message}`));
     });
 };
 
-function setUser(id, data, res) {
+function setUser(id, data, res, next) {
   User.findByIdAndUpdate(
     id,
     data,
@@ -57,14 +58,14 @@ function setUser(id, data, res) {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof ValidationError) {
-        res.status(BAD_REQUEST).send({ message: 'setUserProfile: Переданы некорректные данные при обновлении профиля.' });
+        next(new BadRequestError('setUserProfile: Переданы некорректные данные при обновлении профиля.'));
         return;
       }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: `setUserProfile: ${err.message}` });
+      next(new InternalServerError(`setUserProfile: ${err.message}`));
     });
 }
 
-function getUser(id, res) {
+function getUser(id, res, next) {
   User.findById(id)
     .orFail()
     .then((user) => {
@@ -72,34 +73,34 @@ function getUser(id, res) {
     })
     .catch((err) => {
       if (err instanceof DocumentNotFoundError) {
-        res.status(NOT_FOUND).send({ message: 'getUser: Пользователь по указанному _id не найден.' });
+        next(new NotFoundError('getUser: Пользователь по указанному _id не найден.'));
         return;
       }
       if (err instanceof CastError) {
-        res.status(BAD_REQUEST).send({ message: 'getUser: Задан некорректный _id пользователя.' });
+        next(new BadRequestError('getUser: Задан некорректный _id пользователя.'));
         return;
       }
-      res.status(INTERNAL_SERVER_ERROR).send({ message: `getUser: ${err.message}` });
+      next(new InternalServerError(`getUser: ${err.message}`));
     });
 }
 
-module.exports.setUserProfile = (req, res) => {
-  setUser(req.user._id, { name: req.body.name, about: req.body.about }, res);
+module.exports.setUserProfile = (req, res, next) => {
+  setUser(req.user._id, { name: req.body.name, about: req.body.about }, res, next);
 };
 
-module.exports.setUserAvatar = (req, res) => {
-  setUser(req.user._id, { avatar: req.body.avatar }, res);
+module.exports.setUserAvatar = (req, res, next) => {
+  setUser(req.user._id, { avatar: req.body.avatar }, res, next);
 };
 
-module.exports.getUserMe = (req, res) => {
-  getUser(req.user._id, res);
+module.exports.getUserMe = (req, res, next) => {
+  getUser(req.user._id, res, next);
 };
 
-module.exports.getUserById = (req, res) => {
-  getUser(req.params.userId, res);
+module.exports.getUserById = (req, res, next) => {
+  getUser(req.params.userId, res, next);
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -115,8 +116,6 @@ module.exports.login = (req, res) => {
     })
     .catch((err) => {
       // ошибка аутентификации
-      res
-        .status(UNAUTHORIZED)
-        .send({ message: err.message });
+      next(new UnauthorizedError(`login: ${err.message}`));
     });
 };

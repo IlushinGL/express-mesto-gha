@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const UnauthorizedError = require('../utils/errors/Unauthorized');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -60,19 +61,18 @@ const userSchema = new mongoose.Schema({
 
 // eslint-disable-next-line func-names
 userSchema.statics.findUserByCredentials = function (email, password) {
-  const errCredentials = new Error('Почта или пароль указаны не верно');
-  // errCredentials.statusCode = 401;
+  const errCredentials = new UnauthorizedError('Почта или пароль указаны не верно');
   return this.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
-        // пользователь не найден — отклоняем промис с ошибкой
+        // если пользователь не найден отклоняем промис с ошибкой
         return Promise.reject(errCredentials);
       }
       // сравниваем переданный пароль и хеш из базы
       return bcrypt.compare(password, user.password)
         .then((matched) => {
           if (!matched) {
-            // хеши не совпали — отклоняем промис с ошибкой
+            // если хеши не совпали отклоняем промис с ошибкой
             return Promise.reject(errCredentials);
           }
           // аутентификация успешна теперь user доступен

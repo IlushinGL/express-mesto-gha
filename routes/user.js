@@ -16,7 +16,7 @@ router.get('/me', getUserMe);
 router.get('/:userId', celebrate({
   // валидируем параметр
   params: Joi.object().keys({
-    userId: Joi.string().hex().required(),
+    userId: Joi.string().length(24).hex().required(),
   }),
 }), getUserById);
 
