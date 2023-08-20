@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/error-handler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./utils/errors/not-found-err');
 
 const routesIndex = require('./routes/index');
@@ -15,10 +16,15 @@ app.use(express.urlencoded({ extended: true }));
 
 mongoose.connect(MONGODB_URL);
 
+app.use(requestLogger); // подключаем логгер запросов
+
 app.use('/', routesIndex);
 app.use('/*', (req, res, next) => {
   next(new NotFoundError('app: неизвестный URL'));
 });
+
+app.use(errorLogger); // подключаем логгер ошибок
+
 app.use(errors());
 app.use(errorHandler);
 
