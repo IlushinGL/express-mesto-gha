@@ -5,6 +5,7 @@ const { errors } = require('celebrate');
 const errorHandler = require('./middlewares/error-handler');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const NotFoundError = require('./utils/errors/not-found-err');
+const accessCors = require('./middlewares/cors');
 
 const routesIndex = require('./routes/index');
 
@@ -17,6 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.connect(MONGODB_URL);
 
 app.use(requestLogger); // подключаем логгер запросов
+app.use(accessCors); // подключаем обработку простых кросс запросов
 
 app.use('/', routesIndex);
 app.use('/*', (req, res, next) => {
