@@ -18,7 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 mongoose.connect(MONGODB_URL);
 
 app.use(requestLogger); // подключаем логгер запросов
-app.use(accessCors); // подключаем обработку простых кросс запросов
+app.use(accessCors); // подключаем CORS
 
 app.use('/', routesIndex);
 app.use('/*', (req, res, next) => {

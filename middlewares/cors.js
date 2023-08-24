@@ -4,7 +4,7 @@ const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
 const allowedCors = [
   'https://mesto.iknow.studio',
   'http://mesto.iknow.studio',
-  'http://127.0.0.1:3000',
+  'http://localhost:3000',
 ];
 
 // eslint-disable-next-line consistent-return
