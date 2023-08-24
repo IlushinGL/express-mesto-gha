@@ -13,14 +13,6 @@ module.exports = (req, res, next) => {
   const { origin } = req.headers; // источник запроса
   // список заголовков исходного запроса
   const requestHeaders = req.headers['access-control-request-headers'];
-  if (method === 'OPTIONS') {
-    // указываем разрешенные типы кросс-доменных запросов
-    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
-    // подтверждаем заголовки запроса
-    res.header('Access-Control-Allow-Headers', requestHeaders);
-    // возвращаем ответ клиенту
-    return res.end();
-  }
   // проверяем режим
   if (NODE_ENV !== 'production') {
     // разрешить запросы с любого источника
@@ -28,6 +20,14 @@ module.exports = (req, res, next) => {
   } else if (allowedCors.includes(origin)) {
     // разрешить запросы с указанного источника
     res.header('Access-Control-Allow-Origin', origin);
+  }
+  if (method === 'OPTIONS') {
+    // указываем разрешенные типы кросс-доменных запросов
+    res.header('Access-Control-Allow-Methods', DEFAULT_ALLOWED_METHODS);
+    // подтверждаем заголовки запроса
+    res.header('Access-Control-Allow-Headers', requestHeaders);
+    // возвращаем ответ клиенту
+    return res.end();
   }
   next();
 };
