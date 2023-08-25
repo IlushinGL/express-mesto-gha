@@ -1,23 +1,26 @@
-const { NODE_ENV = 'develoupment' } = process.env;
+const { mode, port, front } = require('../utils/env');
+
+const { NODE_ENV = mode, PORT = port, FRONT_URL = front } = process.env;
 const DEFAULT_ALLOWED_METHODS = 'GET,HEAD,PUT,PATCH,POST,DELETE';
-// TODO: Подумать как вынести список в .env
+
 const allowedCors = [
-  'https://mesto.iknow.studio',
-  'http://mesto.iknow.studio',
-  'http://localhost:3000',
+  `http://${FRONT_URL}`,
+  `https://${FRONT_URL}`,
+  `http://localhost:${PORT}`,
+  `https://localhost:${PORT}`,
 ];
 
-// eslint-disable-next-line consistent-return
+// в режиме разработки можно обращаться из любого источника
+if (NODE_ENV !== 'production') {
+  allowedCors.push('*');
+}
+
 module.exports = (req, res, next) => {
   const { method } = req; // HTTP-метод
   const { origin } = req.headers; // источник запроса
   // список заголовков исходного запроса
   const requestHeaders = req.headers['access-control-request-headers'];
-  // проверяем режим
-  if (NODE_ENV !== 'production') {
-    // разрешить запросы с любого источника
-    res.header('Access-Control-Allow-Origin', '*');
-  } else if (allowedCors.includes(origin)) {
+  if (allowedCors.includes(origin)) {
     // разрешить запросы с указанного источника
     res.header('Access-Control-Allow-Origin', origin);
   }
@@ -29,5 +32,5 @@ module.exports = (req, res, next) => {
     // возвращаем ответ клиенту
     return res.end();
   }
-  next();
+  return next();
 };

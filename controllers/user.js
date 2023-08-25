@@ -14,9 +14,10 @@ const ConflictError = require('../utils/errors/conflict-err');
 const BadRequestError = require('../utils/errors/bad-request-err');
 const NotFoundError = require('../utils/errors/not-found-err');
 const UnauthorizedError = require('../utils/errors/unauthorized-err');
-
-const { SALT_ROUNDS = 8, JWT_SECRET = 'secret_key' } = process.env;
+const { salt, secret } = require('../utils/env');
 const User = require('../models/user');
+
+const { SALT_ROUNDS = salt, JWT_SECRET = secret } = process.env;
 
 module.exports.getAllUsers = (req, res, next) => {
   User.find({})

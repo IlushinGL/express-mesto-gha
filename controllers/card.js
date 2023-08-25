@@ -11,7 +11,6 @@ const InternalServerError = require('../utils/errors/internal-server-err');
 const ForbiddenError = require('../utils/errors/forbidden-err');
 const BadRequestError = require('../utils/errors/bad-request-err');
 const NotFoundError = require('../utils/errors/not-found-err');
-
 const Card = require('../models/card');
 
 module.exports.getAllCards = (req, res, next) => {

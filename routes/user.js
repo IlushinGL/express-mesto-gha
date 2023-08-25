@@ -26,6 +26,7 @@ router.patch('/me', celebrate({
     about: Joi.string().min(2).max(30),
   }).unknown(true),
 }), setUserProfile);
+
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().pattern(validUrl()),
