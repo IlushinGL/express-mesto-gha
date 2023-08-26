@@ -1,15 +1,23 @@
 const mongoose = require('mongoose');
+const validator = require('validator');
 
 const cardSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: false,
-    minlength: 2,
-    maxlength: 30,
+    required: true,
+    minlength: [2, 'Минимальная длина 2 символа'],
+    maxlength: [30, 'Максимальная длина 30 символов'],
   },
   link: {
     type: String,
-    required: false,
+    required: true,
+    validate: {
+      validator: (v) => validator.isURL(v, {
+        protocols: ['http', 'https'],
+        require_protocol: true,
+      }),
+      message: () => 'Некорректный URL',
+    },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
@@ -19,7 +27,7 @@ const cardSchema = new mongoose.Schema({
   likes: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user',
-    default: null,
+    default: [],
   }],
   createdAt: {
     type: Date,
